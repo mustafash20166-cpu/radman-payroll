@@ -1,0 +1,1242 @@
+<!-- STREAMING_CHUNK:Initializing Cloud-Connected Enterprise Payroll & Promotion System -->
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>النظام السحابي الشامل لإدارة وتسكين وترقيات الموظفين - شركة عبد الجليل ردمان (ش.م.ي.م)</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Cairo', sans-serif; }
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col">
+
+    <div id="toast-container" class="fixed bottom-6 left-6 z-50 space-y-2 pointer-events-none"></div>
+
+    <!-- ==================== شاشة تسجيل الدخول ==================== -->
+    <div id="login-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-slate-200">
+            <div class="bg-slate-900 text-white p-6 text-center space-y-3 border-b border-slate-800">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-900/40 border border-blue-500/30 shadow-inner">
+                    <svg class="w-10 h-10 text-amber-400" viewBox="0 0 100 100" fill="currentColor">
+                        <circle cx="50" cy="50" r="45" fill="#1e3a8a"/>
+                        <path d="M25 75 C35 30, 65 30, 75 75 Z" fill="#dc2626"/>
+                        <path d="M40 65 C45 45, 55 45, 60 65 Z" fill="#ffffff"/>
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="font-black text-lg">بوابة الدخول السحابية - الموارد البشرية</h2>
+                    <p class="text-xs text-slate-400 mt-1">شركة عبد الجليل ردمان للتجارة والصناعة (ش.م.ي.م)</p>
+                </div>
+            </div>
+            <div class="p-6 space-y-4">
+                <div id="login-error" class="hidden bg-rose-50 border border-rose-200 text-rose-700 px-4 py-3 rounded-2xl text-xs font-bold"></div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5">البريد الإلكتروني الوظيفي</label>
+                    <input type="email" id="login-email" placeholder="example@ajr.com" class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-2xl text-sm focus:ring-2 focus:ring-blue-600 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5">كلمة المرور</label>
+                    <input type="password" id="login-password" placeholder="أدخل كلمة المرور..." class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-2xl text-sm focus:ring-2 focus:ring-blue-600 focus:outline-none">
+                </div>
+                <button onclick="handleLogin()" class="w-full py-3.5 bg-blue-900 hover:bg-blue-800 text-white font-bold rounded-2xl shadow-lg transition flex items-center justify-center gap-2 text-sm">
+                    تسجيل الدخول السحابي الآمن
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== الهيدر ==================== -->
+    <header class="bg-slate-900 text-white shadow-xl sticky top-0 z-40 border-b border-slate-800 no-print">
+        <div class="container mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-4 space-x-reverse">
+                <div class="bg-white p-1.5 rounded-2xl shadow-md border border-slate-700 flex items-center justify-center w-14 h-14">
+                    <svg class="w-11 h-11" viewBox="0 0 100 100" fill="currentColor">
+                        <circle cx="50" cy="50" r="48" fill="#1e3a8a"/>
+                        <path d="M22 78 C35 25, 65 25, 78 78 Z" fill="#dc2626"/>
+                        <path d="M38 65 C45 42, 55 42, 62 65 Z" fill="#ffffff"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <h1 class="text-base md:text-lg font-black tracking-wide">شركة عبدالجليل ردمان للتجارة والصناعة (ش.م.ي.م)</h1>
+                        <span id="cloud-badge" class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] px-2 py-0.5 rounded-full font-mono flex items-center gap-1">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> متصل بالسحاب
+                        </span>
+                        <span id="user-role-badge" class="hidden bg-blue-500/20 text-blue-400 border border-blue-500/30 text-[10px] px-2 py-0.5 rounded-full font-mono"></span>
+                    </div>
+                    <p class="text-xs text-slate-400 font-mono tracking-wider">ABDUL GALIL RADMAN FOR TRADING & INDUSTRY CO. (C.S.Y.C)</p>
+                </div>
+            </div>
+            <div class="flex items-center flex-wrap gap-2">
+                <button id="btn-promotion" onclick="openPromotionModal()" class="hidden bg-purple-600 hover:bg-purple-700 text-white px-4 py-2.5 rounded-2xl text-xs font-bold shadow-md transition flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                    محرك الترقيات
+                </button>
+                <button id="btn-ai" onclick="openAiModal()" class="hidden bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-2xl text-xs font-bold shadow-md transition flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    مركز الذكاء
+                </button>
+                <button id="btn-calculator" onclick="openCalculatorModal()" class="hidden bg-amber-500 hover:bg-amber-600 text-slate-900 px-4 py-2.5 rounded-2xl text-xs font-bold shadow-md transition flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                    حاسبة التسكين
+                </button>
+                <button onclick="exportAllDataCsv()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-2xl text-xs font-bold shadow-md transition">تصدير CSV</button>
+                <button onclick="openAuditModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3.5 py-2.5 rounded-2xl text-xs font-semibold border border-slate-700 transition">سجل النشاطات</button>
+                <button onclick="handleLogout()" class="bg-rose-950/60 hover:bg-rose-900 text-rose-300 px-3 py-2.5 rounded-2xl text-xs font-semibold border border-rose-800 transition">خروج</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ==================== المحتوى الرئيسي ==================== -->
+    <main class="container mx-auto px-4 py-6 flex-grow space-y-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 no-print">
+            <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-200 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-slate-500">إجمالي الموظفين على رأس العمل</p>
+                    <h3 id="stat-total" class="text-2xl font-black text-slate-900 mt-1">0</h3>
+                </div>
+                <div class="bg-blue-50 text-blue-600 p-3.5 rounded-2xl">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                </div>
+            </div>
+            <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-200 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-slate-500">إجمالي الرواتب الأساسية</p>
+                    <h3 id="stat-basic" class="text-lg md:text-xl font-black text-slate-900 mt-1">0 ر.ي</h3>
+                </div>
+                <div class="bg-amber-50 text-amber-600 p-3.5 rounded-2xl">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+            </div>
+            <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-200 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-slate-500">إجمالي الصافي المستحق</p>
+                    <h3 id="stat-net" class="text-lg md:text-xl font-black text-emerald-600 mt-1">0 ر.ي</h3>
+                </div>
+                <div class="bg-emerald-50 text-emerald-600 p-3.5 rounded-2xl">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+            </div>
+            <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-200 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-slate-500">الفروع والمصنع</p>
+                    <h3 class="text-2xl font-black text-purple-600 mt-1">7 فروع ومصنع</h3>
+                </div>
+                <div class="bg-purple-50 text-purple-600 p-3.5 rounded-2xl">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-4 rounded-3xl shadow-sm border border-slate-200 flex flex-col md:flex-row gap-4 items-center justify-between no-print">
+            <div class="w-full md:w-1/3 relative">
+                <input type="text" id="search-input" placeholder="بحث برقم الموظف، الاسم الرباعي، أو المسمى..." class="w-full pl-4 pr-10 py-3 bg-slate-50 border border-slate-300 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-600">
+                <svg class="w-5 h-5 text-slate-400 absolute right-3.5 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            </div>
+            <div class="w-full md:w-auto flex flex-wrap gap-2 items-center">
+                <select id="filter-dept" class="px-4 py-3 bg-slate-50 border border-slate-300 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-600">
+                    <option value="">جميع الإدارات والفروع</option>
+                    <option value="الإدارة العامة">الإدارة العامة</option>
+                    <option value="فرع صنعاء">فرع صنعاء</option>
+                    <option value="فرع تعز">فرع تعز</option>
+                    <option value="فرع إب">فرع إب</option>
+                    <option value="فرع الحديدة">فرع الحديدة</option>
+                    <option value="فرع عدن">فرع عدن</option>
+                    <option value="فرع ذمار">فرع ذمار</option>
+                    <option value="مصنع الشبك">مصنع الشبك</option>
+                </select>
+                <select id="filter-status" class="px-4 py-3 bg-slate-50 border border-slate-300 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-600">
+                    <option value="">حالة العمل (الكل)</option>
+                    <option value="على رأس العمل">على رأس العمل</option>
+                    <option value="منهي الخدمة">منهي الخدمة (مؤرشف)</option>
+                    <option value="متعاقد">متعاقد</option>
+                </select>
+                <button onclick="resetFilters()" class="px-5 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm font-semibold rounded-2xl transition">إعادة تعيين</button>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-right border-collapse">
+                    <thead>
+                        <tr class="bg-slate-100 text-slate-700 text-xs font-bold uppercase border-b border-slate-200">
+                            <th class="p-4 text-center">الرقم السحابي</th>
+                            <th class="p-4">اسم الموظف الرباعي</th>
+                            <th class="p-4">المسمى الوظيفي</th>
+                            <th class="p-4">الإدارة / الفرع</th>
+                            <th class="p-4 text-center">الفئة والدرجة</th>
+                            <th class="p-4 text-center">الحالة</th>
+                            <th class="p-4 text-left">الراتب الأساسي (55%)</th>
+                            <th class="p-4 text-left">الصافي النهائي</th>
+                            <th class="p-4 text-center no-print">الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="employees-tbody" class="divide-y divide-slate-100 text-sm"></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- ==================== نافذة الترقيات ==================== -->
+    <div id="promotion-modal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden border border-slate-200 max-h-[90vh] overflow-y-auto">
+            <div class="bg-purple-900 text-white p-5 flex justify-between items-center">
+                <div>
+                    <h3 class="font-bold text-base">محرك ترقية وتسوية وتسكين الموظفين (لائحة مارس 2024)</h3>
+                    <p class="text-xs text-purple-200">الشروط: تقييم أداء "جيد" فأكثر، مطابقة المؤهل والخبرة للفئة والدرجة الأعلى</p>
+                </div>
+                <button onclick="closePromotionModal()" class="text-slate-300 hover:text-white p-1 rounded-xl"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div id="promo-error" class="hidden bg-rose-50 border border-rose-200 text-rose-700 px-4 py-3 rounded-2xl text-xs font-bold"></div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5">اختر الموظف المعني بالترقية</label>
+                    <select id="promo-emp-select" onchange="loadEmployeeCurrentGradeForPromotion()" class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-2xl text-sm focus:ring-2 focus:ring-purple-600 focus:outline-none"></select>
+                </div>
+                <div class="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200 text-xs">
+                    <div>
+                        <span class="text-slate-500 block">الفئة والدرجة الحالية:</span>
+                        <strong id="promo-current-grade" class="text-slate-900 font-mono text-sm">--</strong>
+                    </div>
+                    <div>
+                        <span class="text-slate-500 block">الراتب الأساسي الحالي:</span>
+                        <strong id="promo-current-basic" class="text-emerald-700 font-mono text-sm">--</strong>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5">نوع الترقية أو التسوية</label>
+                        <select id="promo-type-select" class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-2xl text-sm focus:ring-2 focus:ring-purple-600 focus:outline-none">
+                            <option value="step">ترقية ترفيع درجة تالية</option>
+                            <option value="vertical">ترقية فئة ومسمى أعلى</option>
+                            <option value="qualification">تسوية ترقية حصول على مؤهل علمي أعلى</option>
+                            <option value="annual">منح العلاوة السنوية الدورية</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5">الفئة والدرجة المستهدفة</label>
+                        <select id="promo-target-cat" class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-2xl text-sm focus:ring-2 focus:ring-purple-600 focus:outline-none">
+                            <option value="A1">فئة الإدارة العليا (A1)</option>
+                            <option value="B1">فئة الإدارة التنفيذية (B1)</option>
+                            <option value="B2">فئة الإدارة التنفيذية (B2)</option>
+                            <option value="B3">فئة الإدارة التنفيذية (B3)</option>
+                            <option value="B4">فئة الإدارة التنفيذية (B4)</option>
+                            <option value="C3-a3">مستوى متقدم (C3-a3)</option>
+                            <option value="C3-a2">مستوى متقدم (C3-a2)</option>
+                            <option value="C3-a1">رئيس قسم / مشرف (C3-a1)</option>
+                            <option value="C3">محاسب / مسئول (C3)</option>
+                            <option value="C4">إداري / ضابط (C4)</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5">تقدير تقييم الأداء (مادة 30)</label>
+                    <select id="promo-perf-score" class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-2xl text-sm focus:ring-2 focus:ring-purple-600 focus:outline-none">
+                        <option value="متميز">متميز جداً (تجاوز الأهداف)</option>
+                        <option value="جيدجداً" selected>جيد جداً (حقق الأهداف بكفاءة عالية)</option>
+                        <option value="جيد">جيد (الحد الأدنى المقبول للترقية)</option>
+                        <option value="ضعيف" class="text-rose-600">ضعيف (مرفوضة الترقية والعلاوة - مادة 31)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="bg-slate-50 p-4 border-t border-slate-200 flex justify-end gap-3">
+                <button onclick="closePromotionModal()" class="px-5 py-2.5 bg-slate-200 text-slate-700 rounded-2xl text-xs font-semibold">إلغاء</button>
+                <button onclick="executeEmployeePromotion()" class="px-6 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-2xl text-xs font-bold shadow-md transition">اعتماد وتسكين الترقية</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== نافذة تفاصيل الراتب ==================== -->
+    <div id="details-modal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-3xl overflow-hidden border border-slate-200 flex flex-col max-h-[90vh]">
+            <div class="bg-slate-900 text-white p-4 flex justify-between items-center no-print">
+                <div class="flex items-center gap-3">
+                    <svg class="w-7 h-7 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    <h3 class="font-bold text-base">قسيمة الراتب الرسمي</h3>
+                </div>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-white p-1 rounded-xl"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+            </div>
+            <div id="modal-body" class="p-6 space-y-6 overflow-y-auto"></div>
+            <div class="bg-slate-50 p-4 border-t border-slate-200 flex justify-between items-center flex-wrap gap-2 no-print">
+                <div class="flex gap-2">
+                    <button onclick="window.print()" class="px-4 py-2.5 bg-blue-900 hover:bg-blue-800 text-white rounded-2xl text-xs font-bold transition">طباعة</button>
+                    <button onclick="shareEmployeeDetailsFromModal()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl text-xs font-bold transition">نسخ ملخص الحساب</button>
+                </div>
+                <button onclick="closeModal()" class="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl text-xs font-semibold transition">إغلاق</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== نافذة سجل النشاطات ==================== -->
+    <div id="audit-modal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden border border-slate-200 flex flex-col max-h-[85vh]">
+            <div class="bg-slate-900 text-white p-4 flex justify-between items-center">
+                <h3 class="font-bold text-base">سجل النشاطات السحابية (Cloud Audit Trail)</h3>
+                <button onclick="closeAuditModal()" class="text-slate-400 hover:text-white p-1 rounded-xl"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+            </div>
+            <div id="audit-log-container" class="p-6 space-y-3 overflow-y-auto text-xs font-mono"></div>
+            <div class="bg-slate-50 p-4 border-t border-slate-200 flex justify-end">
+                <button onclick="closeAuditModal()" class="px-5 py-2.5 bg-slate-900 text-white rounded-2xl text-xs font-semibold">إغلاق</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== نافذة الذكاء الاصطناعي ==================== -->
+    <div id="ai-modal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-4xl overflow-hidden border border-slate-200 flex flex-col max-h-[90vh]">
+            <div class="bg-indigo-900 text-white p-4 flex justify-between items-center">
+                <div class="flex items-center gap-2.5">
+                    <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    <div>
+                        <h3 class="font-bold text-base">مركز ذكاء الموارد البشرية (Gemini AI)</h3>
+                        <p class="text-xs text-indigo-300">التحليل التنفيذي، التوليد الصوتي، الهيكلة، ومساعد اللوائح</p>
+                    </div>
+                </div>
+                <button onclick="closeAiModal()" class="text-slate-400 hover:text-white p-1 rounded-xl"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+            </div>
+            <div class="flex border-b border-slate-200 bg-slate-50 px-4 pt-2 gap-2 flex-wrap">
+                <button onclick="switchAiTab('report')" id="tab-btn-report" class="px-3.5 py-2 text-xs font-bold border-b-2 border-indigo-600 text-indigo-600 transition">التقرير التنفيذي</button>
+                <button onclick="switchAiTab('struct')" id="tab-btn-struct" class="px-3.5 py-2 text-xs font-bold border-b-2 border-transparent text-slate-600 transition">إعادة الهيكلة (JSON)</button>
+                <button onclick="switchAiTab('chat')" id="tab-btn-chat" class="px-3.5 py-2 text-xs font-bold border-b-2 border-transparent text-slate-600 transition">مساعد اللوائح</button>
+                <button onclick="switchAiTab('memo')" id="tab-btn-memo" class="px-3.5 py-2 text-xs font-bold border-b-2 border-transparent text-slate-600 transition">مولد المذكرات</button>
+                <button onclick="switchAiTab('perf')" id="tab-btn-perf" class="px-3.5 py-2 text-xs font-bold border-b-2 border-transparent text-slate-600 transition">مقيم الأداء</button>
+            </div>
+            <div class="p-6 flex-grow overflow-y-auto space-y-4">
+                <div id="ai-tab-report" class="space-y-4">
+                    <div class="flex justify-between items-center flex-wrap gap-2">
+                        <p class="text-xs text-slate-600">توليد تحليل ذكي وشامل لكشف الرواتب مع إمكانية قراءته صوتياً.</p>
+                        <div class="flex gap-2">
+                            <button onclick="generateAiReport()" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl text-xs font-bold">إنشاء التقرير</button>
+                            <button onclick="playReportTts()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl text-xs font-bold">الاستماع TTS</button>
+                        </div>
+                    </div>
+                    <div id="ai-report-result" class="bg-slate-50 border border-slate-200 rounded-2xl p-5 text-sm min-h-[200px] whitespace-pre-line">انقر على "إنشاء التقرير التنفيذي" للبدء...</div>
+                </div>
+                <div id="ai-tab-struct" class="hidden space-y-4">
+                    <div class="flex justify-between items-center">
+                        <p class="text-xs text-slate-600">توليد خطة إعادة هيكلة (JSON).</p>
+                        <button onclick="generateStructuredRestructuring()" class="px-4 py-2.5 bg-indigo-600 text-white rounded-2xl text-xs font-bold">توليد الخطة</button>
+                    </div>
+                    <div id="ai-struct-result" class="bg-slate-900 text-emerald-400 font-mono rounded-2xl p-4 text-xs min-h-[180px] overflow-x-auto whitespace-pre">{ "status": "انتظار..." }</div>
+                </div>
+                <div id="ai-tab-chat" class="hidden space-y-4">
+                    <p class="text-xs text-slate-600">اسأل خبير الموارد البشرية.</p>
+                    <div id="ai-chat-history" class="bg-slate-50 border border-slate-200 rounded-2xl p-4 h-[220px] overflow-y-auto space-y-3 text-xs">
+                        <div class="bg-indigo-50 p-3 rounded-xl"><strong>مساعد HR:</strong> مرحباً بك.</div>
+                    </div>
+                    <div class="flex gap-2">
+                        <input type="text" id="ai-chat-input" placeholder="اكتب سؤالك..." class="flex-grow px-4 py-3 bg-white border border-slate-300 rounded-2xl text-xs">
+                        <button onclick="sendAiChatMessage()" class="px-5 py-3 bg-indigo-600 text-white rounded-2xl text-xs font-bold">إرسال</button>
+                    </div>
+                </div>
+                <div id="ai-tab-memo" class="hidden space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div><label class="block text-xs font-bold text-slate-700 mb-1">اختر الموظف</label><select id="ai-memo-emp-select" class="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-2xl text-xs"></select></div>
+                        <div><label class="block text-xs font-bold text-slate-700 mb-1">نوع المذكرة</label><select id="ai-memo-type" class="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-2xl text-xs"><option value="توصية ترقية وتسكين فئة أعلى">توصية ترقية</option><option value="تقرير تقييم الأداء وصرف العلاوة">تقرير تقييم الأداء</option></select></div>
+                    </div>
+                    <button onclick="generateAiMemoCustom()" class="w-full py-3 bg-indigo-600 text-white rounded-2xl text-xs font-bold">توليد المذكرة</button>
+                    <div id="ai-memo-result" class="bg-slate-50 border border-slate-200 rounded-2xl p-4 text-xs min-h-[140px] whitespace-pre-line"></div>
+                </div>
+                <div id="ai-tab-perf" class="hidden space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div><label class="block text-xs font-bold text-slate-700 mb-1">اختر الموظف</label><select id="ai-perf-emp-select" class="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-2xl text-xs"></select></div>
+                        <div><label class="block text-xs font-bold text-slate-700 mb-1">مستوى الإنجاز</label><select id="ai-perf-score" class="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-2xl text-xs"><option value="متميز جداً">متميز جداً</option><option value="جيد جداً" selected>جيد جداً</option><option value="جيد">جيد</option></select></div>
+                    </div>
+                    <button onclick="generateAiPerformanceReview()" class="w-full py-3 bg-indigo-600 text-white rounded-2xl text-xs font-bold">إعداد التقييم</button>
+                    <div id="ai-perf-result" class="bg-slate-50 border border-slate-200 rounded-2xl p-4 text-xs min-h-[140px] whitespace-pre-line"></div>
+                </div>
+            </div>
+            <div class="bg-slate-50 p-4 border-t border-slate-200 flex justify-end"><button onclick="closeAiModal()" class="px-5 py-2.5 bg-slate-900 text-white rounded-2xl text-xs font-semibold">إغلاق</button></div>
+        </div>
+    </div>
+
+    <!-- ==================== نافذة الحاسبة ==================== -->
+    <div id="calculator-modal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-4xl overflow-hidden border border-slate-200 flex flex-col max-h-[90vh]">
+            <div class="bg-amber-500 text-slate-950 p-5 flex justify-between items-center">
+                <div>
+                    <h3 class="font-black text-lg">حاسبة وتسكين الرواتب الذكية (لائحة مارس 2024)</h3>
+                    <p class="text-xs text-slate-900/80">احتساب الشامل وتوزيع كشف الراتب (55% أساسي، 20% انتقال، 25% مظهر)</p>
+                </div>
+                <button onclick="closeCalculatorModal()" class="text-slate-950 hover:text-white p-1 rounded-xl"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+            </div>
+            <div class="p-6 space-y-6 overflow-y-auto">
+                <div id="calc-error-box" class="hidden bg-rose-50 border border-rose-200 text-rose-700 px-4 py-3 rounded-2xl text-xs font-bold"></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 bg-slate-50 p-4 rounded-3xl border border-slate-200">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">اسم الموظف الرباعي</label>
+                        <input type="text" id="calc-name" placeholder="أدخل اسم الموظف..." class="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-2xl text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">المسمى الوظيفي والفئة</label>
+                        <select id="calc-job-select" onchange="autoCalculateFromSelections()" class="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-2xl text-sm">
+                            <optgroup label="الإدارة العليا (A)">
+                                <option value="رئيس مجلس الإدارة|A1">رئيس مجلس الإدارة (A1)</option>
+                                <option value="الرئيس التنفيذي|A1">الرئيس التنفيذي (A1)</option>
+                                <option value="المدير العام|A1">المدير العام (A1)</option>
+                            </optgroup>
+                            <optgroup label="الإدارة التنفيذية (B)">
+                                <option value="مدير الموارد البشرية والخدمات الإدارية|B1" selected>مدير الموارد البشرية (B1)</option>
+                                <option value="مدير المالية|B1">مدير المالية (B1)</option>
+                                <option value="مدير المشتريات|B2">مدير المشتريات (B2)</option>
+                                <option value="مدير المبيعات|B3">مدير المبيعات (B3)</option>
+                                <option value="مدير فرع|B4">مدير فرع (B4)</option>
+                            </optgroup>
+                            <optgroup label="الإدارة المباشرة والإشرافية (C)">
+                                <option value="رئيس قسم|C3-a1">رئيس قسم (C3-a1)</option>
+                                <option value="محاسب|C3">محاسب (C3)</option>
+                                <option value="إداري|C4">إداري (C4)</option>
+                                <option value="فني تشغيل|C5">فني تشغيل (C5)</option>
+                            </optgroup>
+                            <optgroup label="الإدارة الخدمية (D)">
+                                <option value="سائق نقل ثقيل|D1">سائق نقل ثقيل (D1)</option>
+                                <option value="حارس|D2">حارس (D2)</option>
+                                <option value="عامل النظافة|D3">عامل النظافة (D3)</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">المؤهل العلمي</label>
+                        <select id="calc-qual-select" onchange="autoCalculateFromSelections()" class="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-2xl text-sm">
+                            <option value="دكتوراه|4">دكتوراه (+4 سنوات)</option>
+                            <option value="ماجستير|3">ماجستير (+3 سنوات)</option>
+                            <option value="بكالوريوس|2" selected>بكالوريوس (+2 سنوات)</option>
+                            <option value="دبلوم|1">دبلوم (+1 سنة)</option>
+                            <option value="ثانوية|0">ثانوية عامة</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">سنوات الخبرة / الخدمة</label>
+                        <select id="calc-exp-select" onchange="autoCalculateFromSelections()" class="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-2xl text-sm">
+                            <option value="1">سنة واحدة (درجة 1)</option>
+                            <option value="3">3 سنوات (درجة 3)</option>
+                            <option value="6" selected>6 سنوات (درجة 6)</option>
+                            <option value="10">10 سنوات (درجة 10)</option>
+                            <option value="15">15 سنة فأكثر (نهاية المربوط)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">الإدارة / الفرع</label>
+                        <select id="calc-dept" onchange="autoCalculateFromSelections()" class="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-2xl text-sm">
+                            <option value="الإدارة العامة - صنعاء">الإدارة العامة - صنعاء (شمالية 7%)</option>
+                            <option value="فرع صنعاء">فرع صنعاء (شمالية 7%)</option>
+                            <option value="فرع تعز">فرع تعز (جنوبية 6%)</option>
+                            <option value="فرع عدن">فرع عدن (جنوبية 6%)</option>
+                            <option value="فرع إب">فرع إب (شمالية 7%)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">نوع التوظيف</label>
+                        <select id="calc-type" onchange="autoCalculateFromSelections()" class="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-2xl text-sm">
+                            <option value="على رأس العمل">على رأس العمل (100%)</option>
+                            <option value="متعاقد">متعاقد (70%)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="bg-amber-50 border border-amber-200 p-3.5 rounded-2xl flex items-center justify-between text-xs font-bold text-amber-900 flex-wrap gap-2">
+                    <span>الفئة: <strong id="detected-cat-display" class="bg-amber-200 px-2 py-0.5 rounded">B1</strong></span>
+                    <span>الدرجة: <strong id="detected-deg-display" class="bg-amber-200 px-2 py-0.5 rounded">الدرجة 8</strong></span>
+                    <span>البدلات: <strong id="detected-allowance-rate" class="bg-amber-200 px-2 py-0.5 rounded">30% / 35%</strong></span>
+                </div>
+
+                <div class="bg-slate-900 text-white p-5 rounded-3xl space-y-4">
+                    <h4 class="text-amber-400 font-bold text-sm border-b border-slate-800 pb-2">التوزيع المالي الشامل:</h4>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+                        <div class="bg-slate-800 p-3 rounded-2xl"><span class="text-xs text-slate-400 block">راتب المربوط</span><strong id="preview-scale-basic" class="text-base text-amber-400 font-mono">0 ر.ي</strong></div>
+                        <div class="bg-slate-800 p-3 rounded-2xl"><span class="text-xs text-slate-400 block">إجمالي الشامل</span><strong id="preview-total-gross" class="text-base text-blue-400 font-mono">0 ر.ي</strong></div>
+                        <div class="bg-slate-800 p-3 rounded-2xl"><span class="text-xs text-slate-400 block">الأساسي (55%)</span><strong id="preview-payroll-basic" class="text-base text-emerald-400 font-mono">0 ر.ي</strong></div>
+                        <div class="bg-slate-800 p-3 rounded-2xl"><span class="text-xs text-slate-400 block">البدلات</span><strong id="preview-payroll-allowances" class="text-xs font-mono">20% + 25%</strong></div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 pt-2 border-t border-slate-800 text-center">
+                        <div class="bg-slate-800/60 p-3 rounded-2xl"><span class="text-xs text-rose-400 block">تأمينات موظف</span><strong id="preview-social" class="text-sm font-mono text-rose-300">0 ر.ي</strong></div>
+                        <div class="bg-slate-800/60 p-3 rounded-2xl"><span class="text-xs text-slate-400 block">الوعاء الضريبي</span><strong id="preview-taxable" class="text-sm font-mono text-amber-300">0 ر.ي</strong></div>
+                        <div class="bg-slate-800/60 p-3 rounded-2xl"><span class="text-xs text-slate-400 block">ضريبة الأجور</span><strong id="preview-tax" class="text-sm font-mono text-rose-300">0 ر.ي</strong></div>
+                        <div class="bg-emerald-950/60 border border-emerald-500/30 p-3 rounded-2xl"><span class="text-xs text-emerald-400 block font-bold">الصافي النهائي</span><strong id="preview-net" class="text-lg font-mono text-emerald-400">0 ر.ي</strong></div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-slate-50 p-4 border-t border-slate-200 flex justify-end gap-3">
+                <button onclick="closeCalculatorModal()" class="px-5 py-2.5 bg-slate-200 text-slate-700 rounded-2xl text-sm font-semibold">إلغاء</button>
+                <button id="calc-save-btn" onclick="saveCalculatedEmployee()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl text-sm font-semibold">حفظ في السحاب</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== منطق البرمجة الكامل ==================== -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, doc, getDoc, setDoc, updateDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // ==================== دالة الإشعارات ====================
+        window.showToast = function(msg, type = 'success') {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+            const toast = document.createElement('div');
+            toast.className = `pointer-events-auto px-5 py-3 rounded-2xl shadow-xl text-xs font-bold text-white transition-all transform translate-y-2 opacity-0 ${type === 'error' ? 'bg-rose-600' : 'bg-emerald-600'}`;
+            toast.innerText = msg;
+            container.appendChild(toast);
+            setTimeout(() => { toast.classList.remove('translate-y-2', 'opacity-0'); }, 50);
+            setTimeout(() => {
+                toast.classList.add('translate-y-2', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        };
+
+        // ==================== إعدادات Firebase ====================
+        const myFirebaseConfig = {
+            apiKey: "ضع_مفتاح_API_الخاص_بمشروعك_هنا",
+            authDomain: "اسم_مشروعك.firebaseapp.com",
+            projectId: "اسم_مشروعك",
+            storageBucket: "اسم_مشروعك.appspot.com",
+            messagingSenderId: "رقم_المرسل",
+            appId: "رقم_التطبيق"
+        };
+
+        // ==================== مفتاح Gemini API ====================
+        const GEMINI_API_KEY = "ضع_مفتاح_Gemini_API_هنا";
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'ajr-payroll-system-2024';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : myFirebaseConfig;
+        
+        let app, db, auth;
+        let currentUser = null;
+        let currentUserRole = null;
+        let employeesData = [];
+        let auditLogs = [];
+
+        const salaryScaleBase = { 'A1': 665500, 'A2': 515500, 'A3': 440500, 'B1': 390500, 'B2': 350500, 'B3': 313000, 'B4': 278000, 'B5': 250500, 'C1': 225500, 'C2': 200500, 'C3-a3': 175500, 'C3-a2': 158000, 'C3-a1': 140500, 'C3': 120500, 'C4': 103000, 'C5': 85500, 'D1': 77500, 'D2': 62500, 'D3': 50000 };
+
+        const defaultInitialEmployees = [
+            { empIdNum: 1, name: "عدنان محمد مقبل نعمان", job: "مدير مالي", dept: "الإدارة العامة - صنعاء", grade: "B1 (درجة 8)", type: "على رأس العمل", basic: 247000, total: 449091, net: 305237, hire: "9/1/2022", qual: "بكالوريوس محاسبة", notes: "تسكين في الفئة B1 الدرجة 8." },
+            { empIdNum: 2, name: "علي عبدالعزيز ردمان قاسم", job: "مدير المشتريات", dept: "فرع الحديدة", grade: "B2 (درجة 7)", type: "على رأس العمل", basic: 228900, total: 416181, net: 354237, hire: "1/1/2010", qual: "بكالوريوس محاسبة", notes: "تسكين في الفئة التنفيذية B2." },
+            { empIdNum: 3, name: "علي سلطان سعد البريهي", job: "مدير فرع", dept: "فرع صنعاء", grade: "B4 (درجة 9)", type: "على رأس العمل", basic: 215600, total: 392000, net: 333618, hire: "7/20/2004", qual: "بكالوريوس إدارة أعمال", notes: "تسكين في الفئة B4." },
+            { empIdNum: 13, name: "مطيع مهيوب علي المعمري", job: "محاسب", dept: "فرع تعز", grade: "C3 (درجة 11)", type: "على رأس العمل", basic: 98000, total: 178181, net: 153194, hire: "3/1/1998", qual: "بكالوريوس علوم مصرفية", notes: "فرع تعز." },
+            { empIdNum: 16, name: "قيس توفيق علي الشيباني", job: "ضابط", dept: "فرع عدن", grade: "C4 (درجة 10)", type: "على رأس العمل", basic: 84000, total: 152727, net: 131436, hire: "3/1/2002", qual: "بكالوريوس علاقات عامة", notes: "فرع عدن." }
+        ];
+
+        // ==================== تهيئة Firebase ====================
+        async function initFirebase() {
+            try {
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        currentUser = user;
+                        await fetchUserRole(user.uid);
+                        initCloudListeners();
+                    } else {
+                        currentUser = null;
+                        currentUserRole = null;
+                        applyRolePermissions(null);
+                    }
+                });
+            } catch (e) {
+                console.error("Firebase Init Error:", e);
+                window.showToast("تعذر الاتصال بالسحابة.", "error");
+            }
+        }
+
+        async function fetchUserRole(uid) {
+            try {
+                const userDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', uid);
+                const userDoc = await getDoc(userDocRef);
+                if (userDoc.exists()) {
+                    currentUserRole = userDoc.data().role;
+                    document.getElementById('user-role-badge').innerText = `الصلاحية: ${currentUserRole}`;
+                    document.getElementById('user-role-badge').classList.remove('hidden');
+                    applyRolePermissions(currentUserRole);
+                } else {
+                    currentUserRole = 'branch';
+                    applyRolePermissions('branch');
+                }
+            } catch (e) {
+                console.error("Error fetching role:", e);
+            }
+        }
+
+        function applyRolePermissions(role) {
+            const btnPromotion = document.getElementById('btn-promotion');
+            const btnCalculator = document.getElementById('btn-calculator');
+            const btnAi = document.getElementById('btn-ai');
+
+            if (role === 'admin') {
+                btnPromotion.classList.remove('hidden');
+                btnCalculator.classList.remove('hidden');
+                btnAi.classList.remove('hidden');
+            } else if (role === 'finance') {
+                btnPromotion.classList.add('hidden');
+                btnCalculator.classList.remove('hidden');
+                btnAi.classList.remove('hidden');
+            } else {
+                btnPromotion.classList.add('hidden');
+                btnCalculator.classList.add('hidden');
+                btnAi.classList.add('hidden');
+            }
+            if (employeesData.length > 0) renderTable(employeesData);
+        }
+
+        window.handleLogin = async function() {
+            const email = document.getElementById('login-email').value.trim();
+            const pass = document.getElementById('login-password').value;
+            const errorBox = document.getElementById('login-error');
+            
+            if (!email || !pass) {
+                errorBox.innerText = "يرجى إدخال البريد وكلمة المرور.";
+                errorBox.classList.remove('hidden');
+                return;
+            }
+            errorBox.classList.add('hidden');
+
+            try {
+                await signInWithEmailAndPassword(auth, email, pass);
+                document.getElementById('login-modal').classList.add('hidden');
+                window.showToast("تم تسجيل الدخول بنجاح.");
+            } catch (error) {
+                console.error("Login error:", error);
+                errorBox.innerText = "خطأ في البريد أو كلمة المرور.";
+                errorBox.classList.remove('hidden');
+            }
+        }
+
+        window.handleLogout = async function() {
+            try {
+                await signOut(auth);
+                document.getElementById('login-modal').classList.remove('hidden');
+                document.getElementById('login-email').value = '';
+                document.getElementById('login-password').value = '';
+                window.showToast("تم تسجيل الخروج.");
+            } catch (e) {
+                console.error("Logout error:", e);
+            }
+        }
+
+        async function initCloudListeners() {
+            if (!currentUser) return;
+            const empColRef = collection(db, 'artifacts', appId, 'public', 'data', 'employees');
+            const auditColRef = collection(db, 'artifacts', appId, 'public', 'data', 'audit_logs');
+
+            onSnapshot(empColRef, async (snapshot) => {
+                if (snapshot.empty) {
+                    for (let emp of defaultInitialEmployees) {
+                        const docRef = doc(collection(db, 'artifacts', appId, 'public', 'data', 'employees'));
+                        await setDoc(docRef, { ...emp, docId: docRef.id });
+                    }
+                } else {
+                    employeesData = [];
+                    snapshot.forEach(docSnap => {
+                        employeesData.push({ id: docSnap.id, ...docSnap.data() });
+                    });
+                    filterData();
+                    populateAiDropdowns();
+                }
+            }, (error) => console.error("Firestore sync error:", error));
+
+            onSnapshot(auditColRef, (snapshot) => {
+                auditLogs = [];
+                snapshot.forEach(docSnap => auditLogs.push(docSnap.data()));
+            }, (error) => console.error("Firestore audit sync error:", error));
+        }
+
+        async function logCloudAction(actionText, userRole = 'مدير النظام') {
+            if (!currentUser || !db) return;
+            try {
+                const auditRef = doc(collection(db, 'artifacts', appId, 'public', 'data', 'audit_logs'));
+                await setDoc(auditRef, {
+                    time: new Date().toLocaleString(),
+                    action: actionText,
+                    user: userRole
+                });
+            } catch (e) {
+                console.error("Audit log error:", e);
+            }
+        }
+
+        // ==================== دوال رسم الجدول ====================
+        function renderTable(dataToRender) {
+            const tbody = document.getElementById('employees-tbody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            if (dataToRender.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" class="p-6 text-center text-slate-400">لا توجد سجلات مطابقة.</td></tr>`;
+                return;
+            }
+
+            dataToRender.forEach(emp => {
+                let statusBadge = emp.type === 'منهي الخدمة' ? `<span class="bg-rose-100 text-rose-700 px-3 py-1 rounded-full text-xs font-bold">منهي الخدمة</span>` :
+                                  emp.type === 'متعاقد' ? `<span class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-bold">متعاقد</span>` :
+                                  `<span class="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-bold">على رأس العمل</span>`;
+
+                let actionButtons = `<button onclick="showDetails('${emp.id}')" class="p-2 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-xl text-xs font-bold">قسيمة الراتب</button>`;
+                
+                if (currentUserRole === 'admin') {
+                    actionButtons += `
+                        <button onclick="openPromotionModalForEmp('${emp.id}')" class="p-2 bg-purple-50 text-purple-600 hover:bg-purple-100 rounded-xl text-xs font-bold">ترقية</button>
+                        <button onclick="deleteEmployeeCloud('${emp.id}')" class="p-2 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-xl text-xs font-bold">حذف</button>
+                    `;
+                } else if (currentUserRole === 'finance') {
+                    actionButtons += `<button onclick="deleteEmployeeCloud('${emp.id}')" class="p-2 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-xl text-xs font-bold">حذف</button>`;
+                }
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+                        <td class="p-4 text-center font-mono font-bold text-slate-600">#${emp.empIdNum || emp.id.substring(0,6)}</td>
+                        <td class="p-4 font-bold text-slate-900">${emp.name}</td>
+                        <td class="p-4 text-slate-700">${emp.job}</td>
+                        <td class="p-4 text-slate-600 text-xs">${emp.dept}</td>
+                        <td class="p-4 text-center font-mono text-xs"><span class="bg-slate-100 px-2.5 py-1 rounded-xl">${emp.grade}</span></td>
+                        <td class="p-4 text-center">${statusBadge}</td>
+                        <td class="p-4 text-left font-mono font-bold text-amber-600">${emp.basic.toLocaleString()} ر.ي</td>
+                        <td class="p-4 text-left font-mono font-bold text-emerald-600">${emp.net.toLocaleString()} ر.ي</td>
+                        <td class="p-4 text-center no-print">
+                            <div class="flex items-center justify-center gap-1.5 flex-wrap">${actionButtons}</div>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function updateStats(currentList) {
+            const activeList = currentList.filter(e => e.type !== 'منهي الخدمة');
+            document.getElementById('stat-total').innerText = activeList.length;
+            document.getElementById('stat-basic').innerText = activeList.reduce((s, e) => s + (e.basic || 0), 0).toLocaleString() + ' ر.ي';
+            document.getElementById('stat-net').innerText = activeList.reduce((s, e) => s + (e.net || 0), 0).toLocaleString() + ' ر.ي';
+        }
+
+        // ==================== الفلاتر ====================
+        window.filterData = function() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const dept = document.getElementById('filter-dept').value;
+            const status = document.getElementById('filter-status').value;
+
+            const filtered = employeesData.filter(emp => {
+                const matchQuery = emp.name.toLowerCase().includes(query) || (emp.empIdNum && emp.empIdNum.toString().includes(query)) || emp.job.toLowerCase().includes(query);
+                const matchDept = dept === "" || emp.dept.includes(dept);
+                const matchStatus = status === "" || emp.type === status;
+                return matchQuery && matchDept && matchStatus;
+            });
+            renderTable(filtered);
+            updateStats(filtered);
+        }
+
+        window.resetFilters = function() {
+            document.getElementById('search-input').value = '';
+            document.getElementById('filter-dept').value = '';
+            document.getElementById('filter-status').value = '';
+            renderTable(employeesData);
+            updateStats(employeesData);
+        }
+
+        // ==================== محرك الحسابات ====================
+        function getTaskinAllowanceRates(jobTitle, category) {
+            if (category.startsWith('A') || jobTitle.includes('مدير عام')) return { transport: 0.30, appearance: 0.35 };
+            if (category.startsWith('B') || jobTitle.includes('مدير فرع')) return { transport: 0.30, appearance: 0.30 };
+            if (category.startsWith('C') || jobTitle.includes('محاسب')) return { transport: 0.25, appearance: 0.30 };
+            return { transport: 0.20, appearance: 0.25 };
+        }
+
+        function computePayrollDetails(baseScaleBasic, jobTitle, category, dept, employmentType) {
+            let factor = (employmentType === 'متعاقد') ? 0.7 : 1.0;
+            let adjustedScaleBasic = baseScaleBasic * factor;
+
+            let allowRates = getTaskinAllowanceRates(jobTitle, category);
+            let grossTransport = adjustedScaleBasic * allowRates.transport;
+            let grossAppearance = adjustedScaleBasic * allowRates.appearance;
+            let totalGross = adjustedScaleBasic + grossTransport + grossAppearance;
+
+            let payrollBasic = totalGross * 0.55;
+            let payrollTransport = totalGross * 0.20;
+            let payrollAppearance = totalGross * 0.25;
+
+            let isSouthern = dept.includes('عدن') || dept.includes('تعز');
+            let empSocRate = isSouthern ? 0.06 : 0.07;
+            let empSocAmount = totalGross * empSocRate;
+
+            let taxableIncome = payrollBasic - empSocAmount;
+            let tax = 0;
+            if (taxableIncome > 10000 && taxableIncome <= 20000) {
+                tax = (taxableIncome - 10000) * 0.10;
+            } else if (taxableIncome > 20000) {
+                tax = 1000 + (taxableIncome - 20000) * 0.15;
+            }
+
+            let netSalary = totalGross - empSocAmount - tax;
+
+            return {
+                scaleBasic: Math.round(adjustedScaleBasic),
+                totalGross: Math.round(totalGross),
+                payrollBasic: Math.round(payrollBasic),
+                payrollTransport: Math.round(payrollTransport),
+                payrollAppearance: Math.round(payrollAppearance),
+                empSocRateText: isSouthern ? '6%' : '7%',
+                empSocAmount: Math.round(empSocAmount),
+                taxableIncome: Math.round(taxableIncome),
+                tax: Math.round(tax),
+                net: Math.round(netSalary)
+            };
+        }
+
+        window.autoCalculateFromSelections = function() {
+            const jobVal = document.getElementById('calc-job-select').value.split('|');
+            const jobTitle = jobVal[0];
+            const cat = jobVal[1];
+            const qualBonus = parseInt(document.getElementById('calc-qual-select').value.split('|')[1]);
+            const expYears = parseInt(document.getElementById('calc-exp-select').value);
+            const dept = document.getElementById('calc-dept').value;
+            const type = document.getElementById('calc-type').value;
+
+            let baseVal = salaryScaleBase[cat] || 120500;
+            let finalDeg = Math.min(15, Math.max(1, expYears + qualBonus));
+            let calculatedScaleBasic = baseVal * Math.pow(1.05, finalDeg - 1);
+            let res = computePayrollDetails(calculatedScaleBasic, jobTitle, cat, dept, type);
+
+            document.getElementById('detected-cat-display').innerText = cat;
+            document.getElementById('detected-deg-display').innerText = `الدرجة ${finalDeg}`;
+            document.getElementById('preview-scale-basic').innerText = res.scaleBasic.toLocaleString() + ' ر.ي';
+            document.getElementById('preview-total-gross').innerText = res.totalGross.toLocaleString() + ' ر.ي';
+            document.getElementById('preview-payroll-basic').innerText = res.payrollBasic.toLocaleString() + ' ر.ي';
+            document.getElementById('preview-social').innerText = res.empSocAmount.toLocaleString() + ' ر.ي';
+            document.getElementById('preview-taxable').innerText = res.taxableIncome.toLocaleString() + ' ر.ي';
+            document.getElementById('preview-tax').innerText = res.tax.toLocaleString() + ' ر.ي';
+            document.getElementById('preview-net').innerText = res.net.toLocaleString() + ' ر.ي';
+
+            return { jobTitle, cat, finalDeg, res, dept, type };
+        }
+
+        // ==================== الترقيات ====================
+        window.openPromotionModal = function() {
+            const select = document.getElementById('promo-emp-select');
+            select.innerHTML = '';
+            employeesData.forEach(e => {
+                select.innerHTML += `<option value="${e.id}">#${e.empIdNum || e.id} - ${e.name} (${e.job} - ${e.grade})</option>`;
+            });
+            document.getElementById('promotion-modal').classList.remove('hidden');
+            loadEmployeeCurrentGradeForPromotion();
+        }
+
+        window.closePromotionModal = function() { document.getElementById('promotion-modal').classList.add('hidden'); }
+
+        window.loadEmployeeCurrentGradeForPromotion = function() {
+            const empId = document.getElementById('promo-emp-select').value;
+            const emp = employeesData.find(e => e.id === empId);
+            if (!emp) return;
+            document.getElementById('promo-current-grade').innerText = emp.grade;
+            document.getElementById('promo-current-basic').innerText = emp.basic.toLocaleString() + ' ر.ي';
+        }
+
+        window.openPromotionModalForEmp = function(id) {
+            window.openPromotionModal();
+            document.getElementById('promo-emp-select').value = id;
+            window.loadEmployeeCurrentGradeForPromotion();
+        }
+
+        window.executeEmployeePromotion = async function() {
+            if (!currentUser || currentUserRole !== 'admin') {
+                window.showToast("ليس لديك صلاحية تنفيذ الترقيات.", "error");
+                return;
+            }
+            const empId = document.getElementById('promo-emp-select').value;
+            const promoType = document.getElementById('promo-type-select').value;
+            const targetCat = document.getElementById('promo-target-cat').value;
+            const perfScore = document.getElementById('promo-perf-score').value;
+            const errBox = document.getElementById('promo-error');
+
+            if (perfScore === 'ضعيف') {
+                errBox.innerText = "وفقاً للمادة (31) لا يجوز ترقية الموظف الحاصل على تقييم ضعيف.";
+                errBox.classList.remove('hidden');
+                return;
+            }
+            errBox.classList.add('hidden');
+
+            const emp = employeesData.find(e => e.id === empId);
+            if (!emp) return;
+
+            let baseVal = salaryScaleBase[targetCat] || (emp.basic / 0.55);
+            let promoDesc = "";
+
+            if (promoType === 'step') { promoDesc = `ترفيع درجة (${targetCat})`; baseVal = (salaryScaleBase[targetCat] || (emp.basic / 0.55)) * 1.08; }
+            else if (promoType === 'vertical') { promoDesc = `ترقية فئة (${targetCat})`; baseVal = salaryScaleBase[targetCat] || 313000; }
+            else if (promoType === 'qualification') { promoDesc = `تسوية مؤهل (${targetCat})`; baseVal = (salaryScaleBase[targetCat] || (emp.basic / 0.55)) * 1.15; }
+            else if (promoType === 'annual') { promoDesc = `علاوة سنوية`; baseVal = (emp.basic / 0.55) * 1.05; }
+
+            let res = computePayrollDetails(baseVal, emp.job, targetCat, emp.dept, emp.type);
+
+            const updatedFields = {
+                grade: `${targetCat} (${promoDesc})`,
+                basic: res.payrollBasic,
+                total: res.totalGross,
+                net: res.net,
+                notes: `تم تنفيذ (${promoDesc}) بتقييم (${perfScore}).`
+            };
+
+            try {
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'employees', emp.id);
+                await updateDoc(docRef, updatedFields);
+                await logCloudAction(`تنفيذ ${promoDesc} للموظف ${emp.name}`, "مدير الموارد البشرية");
+                window.closePromotionModal();
+                window.showToast(`تم اعتماد الترقية للموظف (${emp.name})`);
+            } catch (e) {
+                console.error(e);
+                window.showToast("حدث خطأ أثناء التحديث.", "error");
+            }
+        }
+
+        // ==================== الحاسبة ====================
+        window.openCalculatorModal = function() {
+            document.getElementById('calculator-modal').classList.remove('hidden');
+            window.autoCalculateFromSelections();
+        }
+
+        window.closeCalculatorModal = function() { document.getElementById('calculator-modal').classList.add('hidden'); }
+
+        window.saveCalculatedEmployee = async function() {
+            if (!currentUser || (currentUserRole !== 'admin' && currentUserRole !== 'finance')) {
+                window.showToast("ليس لديك صلاحية حفظ الموظفين.", "error");
+                return;
+            }
+            const nameInput = document.getElementById('calc-name').value.trim();
+            const errorBox = document.getElementById('calc-error-box');
+            if (!nameInput) {
+                errorBox.innerText = "يرجى إدخال اسم الموظف.";
+                errorBox.classList.remove('hidden');
+                return;
+            }
+            errorBox.classList.add('hidden');
+            const calc = window.autoCalculateFromSelections();
+
+            const nextEmpNum = employeesData.length > 0 ? Math.max(...employeesData.map(e => e.empIdNum || 1)) + 1 : 1;
+            
+            try {
+                const newDocRef = doc(collection(db, 'artifacts', appId, 'public', 'data', 'employees'));
+                const newEmp = {
+                    docId: newDocRef.id,
+                    empIdNum: nextEmpNum,
+                    name: nameInput,
+                    job: calc.jobTitle,
+                    dept: calc.dept,
+                    grade: `${calc.cat} (درجة ${calc.finalDeg})`,
+                    type: calc.type,
+                    basic: calc.res.payrollBasic,
+                    total: calc.res.totalGross,
+                    net: calc.res.net,
+                    hire: new Date().toLocaleDateString('en-GB'),
+                    qual: "بكالوريوس",
+                    notes: "تسكين سحابي جديد."
+                };
+                await setDoc(newDocRef, newEmp);
+                await logCloudAction(`إضافة موظف جديد: ${nameInput}`, "مدير النظام");
+                window.closeCalculatorModal();
+                window.showToast(`تم حفظ الموظف (${nameInput}) بنجاح`);
+            } catch (e) {
+                console.error(e);
+                window.showToast("حدث خطأ أثناء الحفظ.", "error");
+            }
+        }
+
+        // ==================== الحذف ====================
+        window.deleteEmployeeCloud = async function(id) {
+            if (!currentUser || (currentUserRole !== 'admin' && currentUserRole !== 'finance')) {
+                window.showToast("ليس لديك صلاحية الحذف.", "error");
+                return;
+            }
+            if (confirm && !confirm("هل أنت متأكد من حذف هذا الموظف؟")) return;
+            try {
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'employees', id);
+                await deleteDoc(docRef);
+                await logCloudAction(`حذف موظف برقم: ${id}`, "مدير النظام");
+                window.showToast("تم الحذف بنجاح");
+            } catch (e) {
+                console.error(e);
+                window.showToast("حدث خطأ أثناء الحذف.", "error");
+            }
+        }
+
+        // ==================== التفاصيل ====================
+        let selectedModalEmpId = null;
+        window.showDetails = function(id) {
+            selectedModalEmpId = id;
+            const emp = employeesData.find(e => e.id === id);
+            if (!emp) return;
+            let catMatch = emp.grade.split(' ')[0] || 'B1';
+            let res = computePayrollDetails(emp.basic / 0.55, emp.job, catMatch, emp.dept, emp.type);
+
+            document.getElementById('modal-body').innerHTML = `
+                <div class="bg-white p-6 rounded-3xl border border-slate-200 space-y-6">
+                    <div class="flex justify-between items-center border-b border-slate-200 pb-4 flex-wrap gap-2">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 bg-blue-900 rounded-2xl flex items-center justify-center text-white font-bold">AJR</div>
+                            <div>
+                                <h4 class="font-bold text-slate-900">شركة عبدالجليل ردمان للتجارة والصناعة</h4>
+                                <p class="text-xs text-slate-500">قسيمة الراتب الرسمية - مارس 2024</p>
+                            </div>
+                        </div>
+                        <div class="text-left">
+                            <span class="text-xs text-slate-400 block font-mono">رقم: #${emp.empIdNum || emp.id}</span>
+                            <span class="text-xs text-slate-400 block font-mono">التاريخ: ${new Date().toLocaleDateString('en-GB')}</span>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 text-xs">
+                        <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200"><strong>الموظف:</strong> ${emp.name}</div>
+                        <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200"><strong>الوظيفة:</strong> ${emp.job}</div>
+                        <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200"><strong>الفرع:</strong> ${emp.dept}</div>
+                        <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200"><strong>الفئة:</strong> ${emp.grade}</div>
+                        <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200"><strong>النوع:</strong> ${emp.type}</div>
+                        <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200"><strong>ملاحظات:</strong> ${emp.notes || 'منتظم'}</div>
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+                        <div class="bg-slate-900 text-white p-3.5 rounded-2xl"><span class="text-xs text-slate-400 block">الأساسي (55%)</span><strong class="font-mono text-emerald-400 text-sm">${res.payrollBasic.toLocaleString()} ر.ي</strong></div>
+                        <div class="bg-slate-900 text-white p-3.5 rounded-2xl"><span class="text-xs text-slate-400 block">انتقال (20%)</span><strong class="font-mono text-amber-400 text-sm">${res.payrollTransport.toLocaleString()} ر.ي</strong></div>
+                        <div class="bg-slate-900 text-white p-3.5 rounded-2xl"><span class="text-xs text-slate-400 block">مظهر (25%)</span><strong class="font-mono text-blue-400 text-sm">${res.payrollAppearance.toLocaleString()} ر.ي</strong></div>
+                        <div class="bg-blue-900 text-white p-3.5 rounded-2xl"><span class="text-xs text-blue-200 block">الشامل</span><strong class="font-mono text-white text-base">${res.totalGross.toLocaleString()} ر.ي</strong></div>
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 text-center">
+                        <div class="bg-rose-50 p-3 rounded-2xl border border-rose-200"><span class="text-xs block text-rose-700">تأمينات</span><strong class="font-mono text-rose-900">${res.empSocAmount.toLocaleString()} ر.ي</strong></div>
+                        <div class="bg-rose-50 p-3 rounded-2xl border border-rose-200"><span class="text-xs block text-rose-700">ضريبة</span><strong class="font-mono text-rose-900">${res.tax.toLocaleString()} ر.ي</strong></div>
+                        <div class="bg-emerald-50 p-3 rounded-2xl border border-emerald-200 col-span-2 sm:col-span-1"><span class="text-xs block text-emerald-700 font-bold">الصافي النهائي</span><strong class="font-mono text-emerald-600 text-base">${res.net.toLocaleString()} ر.ي</strong></div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('details-modal').classList.remove('hidden');
+        }
+
+        window.closeModal = function() { document.getElementById('details-modal').classList.add('hidden'); }
+
+        window.shareEmployeeDetailsFromModal = function() {
+            const emp = employeesData.find(e => e.id === selectedModalEmpId);
+            if (!emp) return;
+            const text = `قسيمة راتب: ${emp.name} | ${emp.job} | ${emp.dept} | الصافي: ${emp.net.toLocaleString()} ر.ي`;
+            const textArea = document.createElement("textarea");
+            textArea.value = text; document.body.appendChild(textArea); textArea.select();
+            document.execCommand('copy'); document.body.removeChild(textArea);
+            window.showToast("تم نسخ القسيمة.");
+        }
+
+        // ==================== سجل النشاطات ====================
+        window.openAuditModal = function() {
+            const container = document.getElementById('audit-log-container');
+            container.innerHTML = '';
+            if (auditLogs.length === 0) {
+                container.innerHTML = '<p class="text-slate-400 text-center">لا توجد نشاطات مسجلة بعد.</p>';
+            }
+            auditLogs.forEach(log => {
+                container.innerHTML += `<div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 flex justify-between items-center flex-wrap gap-2"><span>${log.action} (${log.user})</span><span class="text-slate-400">${log.time}</span></div>`;
+            });
+            document.getElementById('audit-modal').classList.remove('hidden');
+        }
+
+        window.closeAuditModal = function() { document.getElementById('audit-modal').classList.add('hidden'); }
+
+        // ==================== تصدير CSV ====================
+        window.exportAllDataCsv = function() {
+            let csvContent = "\uFEFFرقم,الاسم,المسمى,الفرع,الدرجة,الراتب الأساسي,الصافي\n";
+            employeesData.forEach(e => { csvContent += `"${e.empIdNum || e.id}","${e.name}","${e.job}","${e.dept}","${e.grade}","${e.basic}","${e.net}"\n`; });
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.setAttribute('href', url); a.setAttribute('download', 'kashf_rawatib_cloud_2024.csv');
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+            window.showToast("تم تصدير الكشف.");
+        }
+
+        // ==================== الذكاء الاصطناعي (Gemini) ====================
+        async function callGeminiApi(systemPrompt, userQuery) {
+            if (!GEMINI_API_KEY || GEMINI_API_KEY === "ضع_مفتاح_Gemini_API_هنا") {
+                return "عذراً، لم يتم إعداد مفتاح Gemini API. يرجى إضافته في الكود.";
+            }
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+            const payload = { contents: [{ parts: [{ text: userQuery }] }], systemInstruction: { parts: [{ text: systemPrompt }] } };
+            try {
+                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                const result = await response.json();
+                return result.candidates?.[0]?.content?.parts?.[0]?.text || "عذراً، حدث خطأ.";
+            } catch (e) { return "خطأ في الاتصال بالذكاء الاصطناعي."; }
+        }
+
+        async function callGeminiStructuredApi(systemPrompt, userQuery, jsonSchema) {
+            if (!GEMINI_API_KEY || GEMINI_API_KEY === "ضع_مفتاح_Gemini_API_هنا") return { "error": "مفتاح API غير مهيأ" };
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+                generationConfig: { responseMimeType: "application/json", responseSchema: jsonSchema }
+            };
+            try {
+                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                const result = await response.json();
+                const jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                return jsonText ? JSON.parse(jsonText) : null;
+            } catch (e) { return null; }
+        }
+
+        function base64ToArrayBuffer(base64) {
+            const binaryString = atob(base64);
+            const len = binaryString.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) bytes[i] = binaryString.charCodeAt(i);
+            return bytes.buffer;
+        }
+
+        function pcmToWav(pcm16, sampleRate) {
+            const numChannels = 1;
+            const byteRate = sampleRate * numChannels * 2;
+            const blockAlign = numChannels * 2;
+            const dataSize = pcm16.length * 2;
+            const buffer = new ArrayBuffer(44 + dataSize);
+            const view = new DataView(buffer);
+            const writeString = (view, offset, string) => { for (let i = 0; i < string.length; i++) view.setUint8(offset + i, string.charCodeAt(i)); };
+            writeString(view, 0, 'RIFF'); view.setUint32(4, 36 + dataSize, true); writeString(view, 8, 'WAVE');
+            writeString(view, 12, 'fmt '); view.setUint32(16, 16, true); view.setUint16(20, 1, true);
+            view.setUint16(22, numChannels, true); view.setUint32(24, sampleRate, true); view.setUint32(28, byteRate, true);
+            view.setUint16(32, blockAlign, true); view.setUint16(34, 16, true); writeString(view, 36, 'data');
+            view.setUint32(40, dataSize, true);
+            let offset = 44;
+            for (let i = 0; i < pcm16.length; i++, offset += 2) view.setInt16(offset, pcm16[i], true);
+            return new Blob([buffer], { type: 'audio/wav' });
+        }
+
+        async function callGeminiTts(textToSpeak) {
+            if (!GEMINI_API_KEY || GEMINI_API_KEY === "ضع_مفتاح_Gemini_API_هنا") {
+                window.showToast("مفتاح API غير مهيأ.", "error");
+                return;
+            }
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`;
+            const payload = {
+                contents: [{ parts: [{ text: "اقرأ بصوت مهني بالعربية: " + textToSpeak }] }],
+                generationConfig: { responseModalities: ["AUDIO"], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Kore" } } } }
+            };
+            try {
+                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                const result = await response.json();
+                const part = result?.candidates?.[0]?.content?.parts?.[0];
+                const audioData = part?.inlineData?.data;
+                const mimeType = part?.inlineData?.mimeType;
+
+                if (audioData && mimeType && mimeType.startsWith("audio/")) {
+                    const sampleRateMatch = mimeType.match(/rate=(\d+)/);
+                    const sampleRate = sampleRateMatch ? parseInt(sampleRateMatch[1], 10) : 24000;
+                    const pcmData = base64ToArrayBuffer(audioData);
+                    const pcm16 = new Int16Array(pcmData);
+                    const wavBlob = pcmToWav(pcm16, sampleRate);
+                    new Audio(URL.createObjectURL(wavBlob)).play();
+                } else {
+                    window.showToast("تعذر توليد الملف الصوتي.", "error");
+                }
+            } catch (e) { window.showToast("خطأ في خدمة الصوت.", "error"); }
+        }
+
+        window.openAiModal = function() {
+            document.getElementById('ai-modal').classList.remove('hidden');
+            populateAiDropdowns();
+        }
+
+        window.closeAiModal = function() { document.getElementById('ai-modal').classList.add('hidden'); }
+
+        window.switchAiTab = function(tabName) {
+            ['report', 'struct', 'chat', 'memo', 'perf'].forEach(t => {
+                const tabEl = document.getElementById(`ai-tab-${t}`);
+                const btnEl = document.getElementById(`tab-btn-${t}`);
+                if (t === tabName) {
+                    tabEl.classList.remove('hidden');
+                    btnEl.classList.remove('border-transparent', 'text-slate-600');
+                    btnEl.classList.add('border-indigo-600', 'text-indigo-600');
+                } else {
+                    tabEl.classList.add('hidden');
+                    btnEl.classList.remove('border-indigo-600', 'text-indigo-600');
+                    btnEl.classList.add('border-transparent', 'text-slate-600');
+                }
+            });
+        }
+
+        window.generateAiReport = async function() {
+            const box = document.getElementById('ai-report-result');
+            box.innerText = 'جاري إعداد التحليل التنفيذي...';
+            box.innerText = await callGeminiApi("أنت خبير موارد بشرية لشركة عبد الجليل ردمان.", `قم بتحليل كشف الرواتب لعدد ${employeesData.length} موظف.`);
+        }
+
+        window.playReportTts = async function() {
+            const resText = document.getElementById('ai-report-result').innerText;
+            if (!resText || resText.includes('جاري')) { window.showToast('الرجاء إنشاء التقرير أولاً.', "error"); return; }
+            await callGeminiTts(resText);
+        }
+
+        window.generateStructuredRestructuring = async function() {
+            const box = document.getElementById('ai-struct-result');
+            box.innerText = 'جاري التوليد...';
+            const schema = {
+                type: "OBJECT",
+                properties: {
+                    planTitle: { type: "STRING" },
+                    totalBudgetReductionPercent: { type: "NUMBER" },
+                    departments: {
+                        type: "ARRAY",
+                        items: { type: "OBJECT", properties: { departmentName: { type: "STRING" }, recommendedHeadcount: { type: "NUMBER" }, restructuringAction: { type: "STRING" } }, propertyOrdering: ["departmentName", "recommendedHeadcount", "restructuringAction"] }
+                    }
+                },
+                propertyOrdering: ["planTitle", "totalBudgetReductionPercent", "departments"]
+            };
+            const jsonRes = await callGeminiStructuredApi("أنت محلل تنظيمي.", "اقترح خطة إعادة هيكلة للفروع.", schema);
+            box.innerText = JSON.stringify(jsonRes, null, 2);
+        }
+
+        window.sendAiChatMessage = async function() {
+            const input = document.getElementById('ai-chat-input');
+            const history = document.getElementById('ai-chat-history');
+            if (!input.value.trim()) return;
+            const q = input.value; input.value = '';
+            history.innerHTML += `<div class="bg-indigo-600 text-white p-3 rounded-2xl ml-8"><strong>أنت:</strong> ${q}</div>`;
+            const ans = await callGeminiApi("أنت خبير لوائح شركة عبد الجليل ردمان.", q);
+            history.innerHTML += `<div class="bg-indigo-50 text-indigo-900 p-3 rounded-2xl border border-indigo-100 mr-8"><strong>مساعد HR:</strong> ${ans}</div>`;
+            history.scrollTop = history.scrollHeight;
+        }
+
+        function populateAiDropdowns() {
+            const m = document.getElementById('ai-memo-emp-select');
+            const p = document.getElementById('ai-perf-emp-select');
+            if (m) m.innerHTML = ''; if (p) p.innerHTML = '';
+            employeesData.forEach(e => {
+                const opt = `<option value="${e.id}">#${e.empIdNum || e.id} - ${e.name} (${e.job})</option>`;
+                if (m) m.innerHTML += opt; if (p) p.innerHTML += opt;
+            });
+        }
+
+        window.generateAiMemoCustom = async function() {
+            const empId = document.getElementById('ai-memo-emp-select').value;
+            const memoType = document.getElementById('ai-memo-type').value;
+            const box = document.getElementById('ai-memo-result');
+            const emp = employeesData.find(e => e.id === empId);
+            if (!emp) return;
+            box.innerText = 'جاري الصياغة...';
+            box.innerText = await callGeminiApi("أنت مسؤول الموارد البشرية التنفيذي.", `اكتب مذكرة "${memoType}" للموظف: ${emp.name}، الوظيفة: ${emp.job}.`);
+        }
+
+        window.generateAiPerformanceReview = async function() {
+            const empId = document.getElementById('ai-perf-emp-select').value;
+            const score = document.getElementById('ai-perf-score').value;
+            const box = document.getElementById('ai-perf-result');
+            const emp = employeesData.find(e => e.id === empId);
+            if (!emp) return;
+            box.innerText = 'جاري التحليل...';
+            box.innerText = await callGeminiApi("أنت مدير الموارد البشرية.", `أعد تقييم أداء وتوصية علاوة للموظف: ${emp.name} (${emp.job})، الإنجاز: ${score}.`);
+        }
+
+        // ==================== بدء التشغيل ====================
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('search-input')?.addEventListener('input', window.filterData);
+            document.getElementById('filter-dept')?.addEventListener('change', window.filterData);
+            document.getElementById('filter-status')?.addEventListener('change', window.filterData);
+            initFirebase();
+        });
+    </script>
+</body>
+</html>
